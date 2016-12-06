@@ -18,6 +18,7 @@ class Assembly(object):
         for element in self.commands:
             print(element)
     def reset(self):
+        self.acc = None
         self.labels = dict()
         print("RESET")
     def labelUpdate(self,label,value):
