@@ -1,0 +1,134 @@
+class Assembly(object):
+    def __init__(self):
+        self.acc = None
+        self.labels = {}
+        self.commands = ("ADD","SUB","MULT","DIV","END","PRINT","PROMPT","DC","TAX","STORE","LOAD","ALL","RESET","FUNCTIONS")
+        self.status = "RUNNING"
+    def taxes(self,label,rate):
+        value = self.getLabel(label)
+        try:
+            rate = float(rate)
+            tax = value * rate
+            self.acc = tax
+        except:
+            self.raiseError("RATE MUST BE FLOAT")
+    def raiseError(self,text):
+        print(text)
+    def coms(self):
+        for element in self.commands:
+            print(element)
+    def reset(self):
+        self.labels = dict()
+        print("RESET")
+    def labelUpdate(self,label,value):
+        try:
+            import math
+            value = math.floor(float(value))
+            self.labels[label] = value
+        except:
+            self.raiseError("MUST BE INT")
+    def allVars(self):
+      for key in list(self.labels.keys()):
+        print(key, self.labels[key])
+    def getLabel(self,label):
+        if label in self.labels.keys():
+            return self.labels[label]
+        else:
+            self.raiseError("LABEL NOT FOUND")
+    def add(self,label):
+        try:
+            self.acc = self.acc + self.getLabel(label)
+        except:
+            self.raiseError("ERROR")
+    def subtract(self,label):
+        try:
+            self.acc = self.acc - self.getLabel(label)
+        except:
+            self.raiseError("ERROR")
+    def multiply(self,label):
+        try:
+            self.acc = self.acc * self.getLabel(label)
+        except:
+            self.raiseError("ERROR")
+    def divide(self,label):
+        try:
+            self.acc = self.acc / self.getLabel(label)
+        except ZeroDivisionError:
+            self.raiseError("CANNOT DIVIDE BY ZERO")
+        except:
+            self.raiseError("ERROR")
+    def end(self):
+        self.status = False
+    def display(self,label):
+        label = self.getLabel(label)
+        if label != None:
+            print(label)
+    def define(self,label,value):
+        try:
+            value = float(value)
+        except:
+            try:
+                value = self.getLabel(value)
+            except:
+                self.raiseError("MUST BE INT OR LABEL")
+        self.labelUpdate(label,value)
+    def prompt(self,label):
+        value = input(label+"? ")
+        try:
+            value = float(value)
+            self.labelUpdate(label,value)
+        except:
+            self.raiseError("MUST BE INT")
+    def store(self,label):
+        self.labelUpdate(label,self.acc)
+    def load(self,label):
+        self.acc = self.getLabel(label)
+    def process(self,cmd):
+        try:
+            cmd = cmd.split()
+            function = cmd[0]
+            if function == "FUNCTIONS":
+                self.coms()
+            elif function == "RESET":
+                self.reset()
+            elif function == "ALL":
+                self.allVars()
+            elif function == "END":
+                self.end()
+            else:
+                args = cmd[1]
+                args = args.split(",")
+                if function == "ADD":
+                    self.add(args[0])
+                elif function == "SUB":
+                    self.subtract(args[0])
+                elif function == "MULT":
+                    self.multiply(args[0])
+                elif function == "DIV":
+                    self.divide(args[0])
+                elif function == "LOAD":
+                    self.load(args[0])
+                elif function == "STORE":
+                    self.store(args[0])
+                elif function == "PRINT":
+                    self.display(args[0])
+                elif function == "PROMPT":
+                    self.prompt(args[0])
+                elif function == "TAX":
+                    self.taxes(args[0],args[1])
+                elif function == "DC":
+                    self.define(args[0],args[1])
+                else:
+                    self.raiseError("NOT A FUNCTION")
+        except:
+            if cmd[0] in self.commands:
+                self.raiseError("MUST PASS ARGUMENTS")
+            else:
+                self.raiseError("NOT A FUNCTION")
+        return self.status
+program = Assembly()                
+running = True
+print("TYPE FUNCTIONS FOR FUNCTIONS")
+while running:
+    cmd = input("")
+    running = program.process(cmd)
