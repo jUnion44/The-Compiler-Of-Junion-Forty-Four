@@ -11,7 +11,7 @@ class Assembly(object):
             tax = value * rate
             self.acc = tax
         except:
-            raiseError("RATE MUST BE FLOAT")
+            self.raiseError("RATE MUST BE FLOAT")
     def raiseError(self,text):
         print(text)
     def coms(self):
